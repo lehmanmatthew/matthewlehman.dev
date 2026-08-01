@@ -99,7 +99,14 @@
       var p = heroProgress();
       paintOverlay(p);
 
-      if (metaReady) {
+      /* seekable.length is the thing to check, not readyState. If the
+         source is served without HTTP byte-range support the video
+         still reports readyState 4 and a correct duration, but has no
+         seekable range — every currentTime assignment silently clamps
+         back to 0. Guarding here means we don't spin the decoder
+         issuing seeks that can never land. Hosts that do support
+         ranges (Cloudflare Pages does) are unaffected. */
+      if (metaReady && video.seekable.length) {
         // Stay a hair short of the very end: some browsers fire
         // `ended` and blank the frame if you land exactly on it.
         targetTime = p * (duration - 0.05);
@@ -121,23 +128,51 @@
       if (rafId === null) rafId = requestAnimationFrame(frame);
     }
 
-    video.addEventListener('loadedmetadata', function () {
+
+    /* Nudge the decoder awake so the first seek isn't a black frame.
+       Muted + playsinline normally means this is allowed without a
+       gesture — but if a browser refuses anyway, retry inside the
+       first real interaction, which iOS always permits. Without this
+       the video never decodes a frame and the hero is just black. */
+    function kickDecoder() {
+      var kick;
+      try { kick = video.play(); } catch (e) { return; }
+
+      if (!kick || typeof kick.then !== 'function') { video.pause(); return; }
+
+      kick.then(function () {
+        video.pause();
+      }).catch(function () {
+        var retry = function () {
+          var p = video.play();
+          if (p && p.then) p.then(function () { video.pause(); }).catch(function () {});
+          window.removeEventListener('touchstart', retry);
+          window.removeEventListener('click', retry);
+        };
+        window.addEventListener('touchstart', retry, { once: true, passive: true });
+        window.addEventListener('click', retry, { once: true });
+      });
+    }
+
+    function initVideo() {
+      if (metaReady) return;
       if (!isFinite(video.duration) || video.duration <= 0) return;
       duration  = video.duration;
       metaReady = true;
+      kickDecoder();
+      try { video.currentTime = prefersReducedMotion ? 0.1 : 0; } catch (e) {}
+    }
 
-      // Nudge the decoder awake so the first seek isn't a black frame.
-      // Muted + playsinline means this is allowed without a gesture;
-      // if a browser refuses, the catch keeps everything else running.
-      var kick = video.play();
-      if (kick && typeof kick.then === 'function') {
-        kick.then(function () { video.pause(); }).catch(function () { /* autoplay blocked */ });
-      } else {
-        video.pause();
-      }
+    video.addEventListener('loadedmetadata', initVideo);
 
-      video.currentTime = 0;
-    });
+    /* THE RACE THIS FIXES: script.js runs at the end of <body>, and
+       with preload="auto" on a local or cached file the video can
+       reach HAVE_METADATA *before* the listener above is attached.
+       The event is then long gone, initVideo never runs, metaReady
+       stays false, and the scrub silently does nothing forever —
+       intermittently, since it depends on load timing. Checking
+       readyState directly covers the case where we arrived late. */
+    if (video.readyState >= 1) initVideo();
 
     // Only burn frames while the hero is actually on screen.
     if ('IntersectionObserver' in window) {
@@ -148,11 +183,8 @@
     }
 
     if (prefersReducedMotion) {
-      // No scrub: the track is collapsed to 100vh by CSS, so just
-      // park the video on an early frame and leave the overlay up.
-      video.addEventListener('loadedmetadata', function () {
-        try { video.currentTime = 0.1; } catch (e) {}
-      });
+      // No scrub: the track is collapsed to 100vh by CSS, and
+      // initVideo() has already parked the video on an early frame.
       stage.style.setProperty('--hero-fade', '1');
     } else {
       startLoop();
