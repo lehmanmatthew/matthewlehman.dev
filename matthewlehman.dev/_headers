@@ -1,0 +1,62 @@
+# Cloudflare Pages reads this file at deploy time.
+# Rules are matched top to bottom; every matching rule applies.
+
+/*
+  # Basic hardening. No frames, no MIME sniffing, referrer trimmed
+  # to the origin on cross-site requests.
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Nothing here uses a camera, mic, or location — say so.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+# HTML must revalidate, or a deploy won't reach anyone still holding
+# a cached copy. must-revalidate keeps it correct without going
+# fully no-store.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Fonts, images and video are content-addressed by filename here —
+# if one changes, its name changes — so they can cache hard.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+/img/*
+  Cache-Control: public, max-age=31536000, immutable
+/herovid.mp4
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS and JS keep their filenames across deploys, so they get a
+# short TTL rather than a year. Bump to immutable only if you start
+# adding a hash to the filename.
+/styles.css
+  Cache-Control: public, max-age=3600, must-revalidate
+/script.js
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Icons and social card. Listed one by one rather than with a
+# /*.png glob — Pages' matching is deliberately simple and a
+# trailing-extension wildcard is not something to rely on.
+/favicon.ico
+  Cache-Control: public, max-age=604800
+/favicon-16.png
+  Cache-Control: public, max-age=604800
+/favicon-32.png
+  Cache-Control: public, max-age=604800
+/favicon-48.png
+  Cache-Control: public, max-age=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+/icon-192.png
+  Cache-Control: public, max-age=604800
+/icon-512.png
+  Cache-Control: public, max-age=604800
+/og.jpg
+  Cache-Control: public, max-age=604800
+/poster.jpg
+  Cache-Control: public, max-age=2592000
+/site.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=604800
