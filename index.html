@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matthew Lehman — Photographer &amp; Developer</title>
+<meta name="description" content="Matthew Lehman — sports photographer and developer in Logan, Ohio. Game-day photography, websites, and a SaaS platform for monument companies.">
+<meta name="theme-color" content="#0a0810">
+<link rel="canonical" href="https://matthewlehman.dev/">
+
+<!-- Open Graph / social preview. Drop an og.jpg (1200x630) next to index.html. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Matthew Lehman — Photographer &amp; Developer">
+<meta property="og:description" content="Sports photography and web development out of Logan, Ohio.">
+<meta property="og:url" content="https://matthewlehman.dev/">
+<meta property="og:image" content="https://matthewlehman.dev/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Icons. Every PNG here keeps its alpha channel except the Apple
+     one — iOS flattens transparency onto a solid colour it picks
+     itself, so that file bakes in the site background (#0a0810)
+     rather than letting it land on white. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Subtle dot-grid texture layer, fixed behind everything -->
+<div class="texture" aria-hidden="true"></div>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="wordmark" href="#top" aria-label="Matthew Lehman — home">
+      <img src="img/ml-logo.png" alt="Matthew Lehman" width="132" height="74">
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#skills">Skills</a>
+      <!-- A real page, not an in-page anchor. The smooth-scroll
+           handler only intercepts href^="#", so this navigates
+           normally, and the scroll-spy simply never marks it active. -->
+      <a class="nav__page" href="/links">Links</a>
+    </nav>
+
+    <!-- Mobile menu toggle -->
+    <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile dropdown menu -->
+  <div class="nav__mobile" id="mobileMenu" hidden>
+    <a href="#about">About</a>
+    <a href="#work">Work</a>
+    <a href="#skills">Skills</a>
+    <a class="nav__page" href="/links">Links</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     HERO — scroll-scrubbed video
+     The .hero-track is tall (see --hero-scroll in styles.css);
+     the .hero-stage inside it is sticky at 100vh, so the video
+     stays pinned while the page scrolls past it. Scroll progress
+     through the track maps 1:1 onto video currentTime.
+
+     herovid.mp4 already sits next to this file. If you swap it for
+     new footage, keep the same filename or update the src below.
+     ============================================================ -->
+<main id="top">
+<section class="hero-track" id="heroTrack">
+  <div class="hero-stage">
+
+    <video
+      class="hero-video"
+      id="heroVideo"
+      src="herovid.mp4"
+      poster="poster.jpg"
+      muted
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      disablepictureinpicture
+      aria-hidden="true"
+      tabindex="-1"></video>
+
+    <!-- Vignette + darkening so the headline always stays legible -->
+    <div class="hero-scrim" aria-hidden="true"></div>
+
+    <div class="hero-overlay" id="heroOverlay">
+      <p class="label hero-label" data-scramble>Logan, Ohio</p>
+      <h1 class="hero-title" data-split>Matthew Lehman</h1>
+      <p class="hero-tagline">Photographer &amp; Developer — Logan, Ohio</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="section__head reveal">
+      <span class="label label--num">01</span>
+      <h2 class="section__title" data-split>About</h2>
+    </div>
+
+    <div class="about">
+      <div class="about__lead reveal">
+        <p>
+          I'm <strong>Matthew Lehman</strong>. I shoot sports and I build
+          websites, out of Logan, Ohio.
+        </p>
+        <p>
+          The photography is mostly athletics: game days, portraits, whole
+          teams. The development work is web design and full-stack builds for
+          small businesses, local organizations, and one SaaS product of my own.
+        </p>
+        <p>
+          Independent since 2025. Usually I'm the only person on a project, so
+          the site and the photos in it come from the same place.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     WORK — horizontal scroll gallery
+     Vertical scrolling through the tall #workTrack translates the
+     panel row sideways. Same mechanic as the Motion example, done
+     with a rAF lerp instead of useScroll/useTransform.
+
+     The track's height is computed in JS from the actual width of
+     the panel row, so you can add or remove projects freely — the
+     scroll distance retunes itself. No magic numbers to update.
+
+     Each panel fills the window. To add a screenshot, uncomment the
+     .panel__thumb block inside it — at this size the image becomes a
+     dimmed full-bleed backdrop behind the copy, not a thumbnail, so
+     use something wide: 1920x1080 or larger.
+     ============================================================ -->
+<section class="work" id="work">
+  <div class="work-track" id="workTrack">
+    <div class="work-sticky">
+
+      <div class="wrap work-head">
+        <span class="label label--num">02</span>
+        <h2 class="section__title" data-split>Work</h2>
+        <!-- Frame counter + horizontal progress, both driven by the
+             gallery's scroll position -->
+        <span class="work-count label" id="workCount" aria-hidden="true">01<em>/</em>04</span>
+        <span class="work-progress" aria-hidden="true"><i id="workBar"></i></span>
+      </div>
+
+      <div class="gallery" id="workGallery">
+
+        <!-- ---- Tri County Web Design ---- -->
+        <a class="panel" href="https://tricountywebdesign.com" target="_blank" rel="noopener noreferrer">
+          <div class="panel__body">
+
+            <div class="panel__copy">
+              <span class="panel__index" aria-hidden="true">01</span>
+              <h3 class="panel__title">Tri County Web Design</h3>
+              <p class="panel__desc">
+                The web design practice I run. Mobile-first sites with local SEO
+                and scroll animations, for small businesses around Southeastern
+                Ohio.
+              </p>
+              <ul class="tags">
+                <li>Web Design</li><li>SEO</li><li>Business</li>
+              </ul>
+              <span class="panel__link">tricountywebdesign.com <span class="panel__arrow" aria-hidden="true">↗</span></span>
+            </div>
+
+            <div class="preview" aria-hidden="true">
+              <div class="preview__bar">
+                <span class="preview__dots"><i></i><i></i><i></i></span>
+                <span class="preview__url">tricountywebdesign.com</span>
+              </div>
+              <div class="preview__screen">
+                <img src="img/tricounty.jpg" alt="" loading="lazy" width="1600" height="766">
+              </div>
+            </div>
+
+          </div>
+        </a>
+
+        <!-- ---- MonuManage ---- -->
+        <a class="panel" href="https://monumanage.com" target="_blank" rel="noopener noreferrer">
+          <div class="panel__body">
+
+            <div class="panel__copy">
+              <span class="panel__index" aria-hidden="true">02</span>
+              <h3 class="panel__title">MonuManage</h3>
+              <p class="panel__desc">
+                A SaaS platform for monument and memorial companies: order
+                tracking, proof storage, online family approvals, AI inscription
+                checks. The biggest thing I've built.
+              </p>
+              <ul class="tags">
+                <li>SaaS</li><li>Full-Stack</li><li>AI</li>
+              </ul>
+              <span class="panel__link">monumanage.com <span class="panel__arrow" aria-hidden="true">↗</span></span>
+            </div>
+
+            <div class="preview" aria-hidden="true">
+              <div class="preview__bar">
+                <span class="preview__dots"><i></i><i></i><i></i></span>
+                <span class="preview__url">app.monumanage.com</span>
+              </div>
+              <div class="preview__screen">
+                <img src="img/monumanage.jpg" alt="" loading="lazy" width="1600" height="718">
+              </div>
+            </div>
+
+          </div>
+        </a>
+
+        <!-- ---- Logan AFJROTC ---- -->
+        <a class="panel" href="https://loganjrotc.org" target="_blank" rel="noopener noreferrer">
+          <div class="panel__body">
+
+            <div class="panel__copy">
+              <span class="panel__index" aria-hidden="true">03</span>
+              <h3 class="panel__title">Logan AFJROTC <span class="panel__sub">OH-20221</span></h3>
+              <p class="panel__desc">
+                The whole site for my school's Air Force JROTC unit. Announcements,
+                calendar, gallery, roster, and a cadet login behind it all.
+              </p>
+              <ul class="tags">
+                <li>Full-Stack</li><li>Auth</li><li>CMS</li>
+              </ul>
+              <span class="panel__link">loganjrotc.org <span class="panel__arrow" aria-hidden="true">↗</span></span>
+            </div>
+
+            <div class="preview" aria-hidden="true">
+              <div class="preview__bar">
+                <span class="preview__dots"><i></i><i></i><i></i></span>
+                <span class="preview__url">loganjrotc.org</span>
+              </div>
+              <!-- No site screenshot for this one yet, so the unit badge
+                   stands in. --badge centres it instead of cropping it to
+                   fill. Swap in a real screenshot later by replacing this
+                   whole block with the same markup the other panels use. -->
+              <div class="preview__screen preview__screen--badge">
+                <img src="img/jrotc-badge.png" alt="" loading="lazy" width="450" height="450">
+              </div>
+            </div>
+
+          </div>
+        </a>
+
+        <!-- ---- Matthew Lehman Media ---- -->
+        <a class="panel" href="https://matthewlehmanmedia.com" target="_blank" rel="noopener noreferrer">
+          <div class="panel__body">
+
+            <div class="panel__copy">
+              <span class="panel__index" aria-hidden="true">04</span>
+              <h3 class="panel__title">Matthew Lehman Media</h3>
+              <p class="panel__desc">
+                Where the photography work lives. Game-day action, athlete
+                portraits, team shoots.
+              </p>
+              <ul class="tags">
+                <li>Photography</li><li>Branding</li>
+              </ul>
+              <span class="panel__link">matthewlehmanmedia.com <span class="panel__arrow" aria-hidden="true">↗</span></span>
+            </div>
+
+            <div class="preview" aria-hidden="true">
+              <div class="preview__bar">
+                <span class="preview__dots"><i></i><i></i><i></i></span>
+                <span class="preview__url">matthewlehmanmedia.com</span>
+              </div>
+              <div class="preview__screen">
+                <img src="img/mlmedia.jpg" alt="" loading="lazy" width="1600" height="763">
+              </div>
+            </div>
+
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SKILLS
+     ============================================================ -->
+<section class="section" id="skills">
+  <div class="wrap">
+    <div class="section__head reveal">
+      <span class="label label--num">03</span>
+      <h2 class="section__title" data-split>Skills</h2>
+    </div>
+
+    <!-- Interactive index. Each skill is a real <button> in a tablist:
+         hover to browse with a mouse, arrow keys to browse from the
+         keyboard, and the panel on the right updates either way.
+
+         To edit: change data-desc for the copy, and data-projects for
+         which projects it links to. The project keys map to the
+         PROJECTS registry near the top of section 6 in script.js. -->
+    <div class="skills reveal">
+
+      <div class="skills__index" role="tablist" aria-label="Skills" aria-orientation="vertical">
+
+        <p class="skills__group label">Development</p>
+
+        <button class="skill" role="tab" id="sk-0" aria-controls="skillDetail" aria-selected="true"
+          data-desc="Semantic markup, custom CSS, vanilla JavaScript. Custom builds rather than template themes."
+          data-projects="tricounty jrotc mlmedia">HTML / CSS / JS</button>
+
+        <button class="skill" role="tab" id="sk-1" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Mobile-first, and checked against real viewport budgets rather than breakpoints picked by guess."
+          data-projects="tricounty jrotc mlmedia">Responsive Design</button>
+
+        <button class="skill" role="tab" id="sk-2" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Structure, metadata, and the on-page work that decides whether a local business turns up in local results."
+          data-projects="tricounty">SEO</button>
+
+        <button class="skill" role="tab" id="sk-3" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Auth, databases, admin tooling — the unglamorous half that lives behind a login screen."
+          data-projects="monumanage jrotc">Full-Stack Apps</button>
+
+        <button class="skill" role="tab" id="sk-4" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Inscription checking in MonuManage: model calls wired into an existing workflow, not bolted on the side."
+          data-projects="monumanage">AI Integration</button>
+
+        <p class="skills__group label">Photography</p>
+
+        <button class="skill" role="tab" id="sk-5" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Fast shutters under bad light, and reading the play before it develops."
+          data-projects="mlmedia">Game-Day Action</button>
+
+        <button class="skill" role="tab" id="sk-6" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Posed and lit, built around the athlete rather than the sport."
+          data-projects="mlmedia">Athlete Portraits</button>
+
+        <button class="skill" role="tab" id="sk-7" aria-controls="skillDetail" aria-selected="false"
+          data-desc="Whole rosters moved through quickly and kept consistent frame to frame."
+          data-projects="mlmedia">Team Shoots</button>
+      </div>
+
+      <div class="skills__detail" id="skillDetail" role="tabpanel" aria-labelledby="sk-0">
+        <span class="skills__num" aria-hidden="true">01</span>
+        <h3 class="skills__title"></h3>
+        <p class="skills__desc"></p>
+        <div class="skills__used">
+          <span class="label">Where it shows up</span>
+          <ul class="skills__projects"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer" id="contact">
+  <div class="wrap">
+
+    <!-- The only contact point on the site, so it gets display type
+         rather than being buried in small print. -->
+    <div class="footer__reach">
+      <div class="footer__direct">
+        <a class="footer__email" href="mailto:lehmanmatthew0@gmail.com">lehmanmatthew0@gmail.com</a>
+        <!-- tel: uses E.164 (+1…) so it dials correctly from any
+             device; the visible text stays in readable US format. -->
+        <a class="footer__phone" href="tel:+17402161697">740.216.1697</a>
+      </div>
+      <a class="footer__social" href="https://instagram.com/mlmedia_28" target="_blank" rel="noopener noreferrer">
+        Instagram <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+
+    <div class="footer__meta">
+      <span class="label">© <span id="year">2026</span> Matthew Lehman</span>
+      <!-- Live local time. Small, human, and true — beats a tagline. -->
+      <span class="label footer__local">
+        Logan, Ohio <span class="footer__clock" id="clock">--:--:--</span>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

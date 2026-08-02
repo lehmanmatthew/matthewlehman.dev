@@ -1,0 +1,13 @@
+# matthewlehman.dev
+# Everything here is public and meant to be found.
+
+User-agent: *
+Allow: /
+Disallow: /cdn-cgi/
+
+Sitemap: https://matthewlehman.dev/sitemap.xml
+
+# Note: this same file is also served on the *.pages.dev preview URL
+# for every deploy, so it can't be used to hide previews from search.
+# The <link rel="canonical"> tags in index.html and links.html are what
+# point crawlers at the real domain.

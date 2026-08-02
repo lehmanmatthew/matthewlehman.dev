@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Two pages, listed by hand. Update <lastmod> when you change a page —
+  it's the one hint here that search engines actually act on.
+  <priority> and <changefreq> are deliberately omitted: Google has
+  said for years that it ignores both, so they'd be noise.
+
+  The URLs must match the <link rel="canonical"> tags exactly, right
+  down to the trailing slash, or the two signals contradict each other.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://matthewlehman.dev/</loc>
+    <lastmod>2026-08-01</lastmod>
+  </url>
+
+  <url>
+    <loc>https://matthewlehman.dev/links</loc>
+    <lastmod>2026-08-01</lastmod>
+  </url>
+
+</urlset>
